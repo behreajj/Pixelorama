@@ -114,6 +114,7 @@ void fragment() {
 
     // Determine mix factor based on requested type.
     vec4 original_color = texture(TEXTURE, UV);
+    float alpha_origin = original_color.a;
     vec3 srgb_origin = original_color.rgb;
     vec3 lrgb_origin = standardToLinear(srgb_origin);
     vec3 xyz_origin = linearToXyz(lrgb_origin);
@@ -156,20 +157,16 @@ void fragment() {
     lrgb_d = min(max(lrgb_d, 0.0), 1.0);
     vec3 srgb_d = linearToStandard(lrgb_d);
 
-    vec3 output;
+    float alpha_c = mix(alpha_a, alpha_b, factor);
+    // float alpha_d = mix(alpha_origin, alpha_c, percent);
+    float alpha_d = min(alpha_origin, alpha_c);
+
     if(affect_selection && has_selection) {
         vec4 selection_color = texture(selection, UV);
-        output = mix(original_color.rgb, srgb_d, selection_color.a);
-    } else {
-        output = srgb_d;
+        float alpha_sel = selection_color.a;
+        srgb_d = mix(srgb_origin, srgb_d, alpha_sel);
+        alpha_d = mix(alpha_origin, alpha_d, alpha_sel);
     }
 
-    // float alpha_c = mix(srgb_a.a, srgb_b.a, factor * percent);
-    float alpha_c = mix(alpha_a, alpha_b, factor * percent);
-
-    // Final alpha is the minimum of the user selected colors
-    // and the source color.
-    // Not sure if alpha premultiply is an issue.
-    COLOR = vec4(output.rgb, min(original_color.a, alpha_c));
-    COLOR = vec4(output.rgb, original_color.a);
+    COLOR = vec4(srgb_d, alpha_d);
 }
