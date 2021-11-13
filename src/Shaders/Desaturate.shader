@@ -9,8 +9,13 @@ uniform bool is_avg;
 uniform bool is_hsl;
 uniform bool is_hsv;
 
-uniform vec4 srgb_a;
-uniform vec4 srgb_b;
+// uniform vec4 srgb_a;
+// uniform vec4 srgb_b;
+
+uniform vec3 lab_a;
+uniform float alpha_a;
+uniform vec3 lab_b;
+uniform float alpha_b;
 
 uniform int levels;
 uniform float percent;
@@ -109,6 +114,11 @@ void fragment() {
 
     // Determine mix factor based on requested type.
     vec4 original_color = texture(TEXTURE, UV);
+    vec3 srgb_origin = original_color.rgb;
+    vec3 lrgb_origin = standardToLinear(srgb_origin);
+    vec3 xyz_origin = linearToXyz(lrgb_origin);
+    vec3 lab_origin = xyzToLab(xyz_origin);
+
     float factor = 0.0;
     if (is_avg) {
         factor = grayAverage(original_color.rgb);
@@ -117,56 +127,49 @@ void fragment() {
     } else if (is_hsv) {
         factor = grayHsv(original_color.rgb);
     } else {
-        vec3 lrgb_origin = standardToLinear(original_color.rgb);
-		factor = grayLuminance(lrgb_origin);
+		// factor = grayLuminance(lrgb_origin);
+        factor = lab_origin.x * 0.01;
     }
 
     // For pixel art, discrete steps may be preferable
     // over a smooth transition.
-    factor = quantize(factor, levels);
-
-    // This assumes that a gradient consisting of two polar
-    // colors is enough. Maybe a texture look up of an
-    // image with 1x1 swatch for each palette entry would be
-    // the next step?
+    factor = quantize(min(factor, 1.0), levels);
 
     // Convert a color to LAB.
     // This could be done on the CPU and passed in.
-    vec3 lrgb_a = standardToLinear(srgb_a.rgb);
-    vec3 xyz_a = linearToXyz(lrgb_a);
-    vec3 lab_a = xyzToLab(xyz_a);
+    // vec3 lrgb_a = standardToLinear(srgb_a.rgb);
+    // vec3 xyz_a = linearToXyz(lrgb_a);
+    // vec3 lab_a = xyzToLab(xyz_a);
 
     // Convert b color to LAB.
     // This could be done on the CPU and passed in.
-    vec3 lrgb_b = standardToLinear(srgb_b.rgb);
-    vec3 xyz_b = linearToXyz(lrgb_b);
-    vec3 lab_b = xyzToLab(xyz_b);
+    // vec3 lrgb_b = standardToLinear(srgb_b.rgb);
+    // vec3 xyz_b = linearToXyz(lrgb_b);
+    // vec3 lab_b = xyzToLab(xyz_b);
 
-    // Mix colors by brightness, convert back to sRGB.
+    // Mix colors by brightness, then mix by percent.
+    // Convert from CIE LAB back to sRGB.
     vec3 lab_c = mix(lab_a, lab_b, factor);
-    vec3 xyz_c = labToXyz(lab_c);
-    vec3 lrgb_c = xyzToLinear(xyz_c);
-    vec3 srgb_c = linearToStandard(lrgb_c);
-
-    // Clamp to sRGB gamut.
-    // Might want to test to see if this is necessary.
-    srgb_c = min(max(srgb_c, 0.0), 1.0);
-
-    // Mix according to percentage.
-    srgb_c = mix(original_color.rgb, srgb_c, percent);
+    vec3 lab_d = mix(lab_origin, lab_c, percent);
+    vec3 xyz_d = labToXyz(lab_d);
+    vec3 lrgb_d = xyzToLinear(xyz_d);
+    lrgb_d = min(max(lrgb_d, 0.0), 1.0);
+    vec3 srgb_d = linearToStandard(lrgb_d);
 
     vec3 output;
     if(affect_selection && has_selection) {
         vec4 selection_color = texture(selection, UV);
-        output = mix(original_color.rgb, srgb_c, selection_color.a);
+        output = mix(original_color.rgb, srgb_d, selection_color.a);
     } else {
-        output = srgb_c;
+        output = srgb_d;
     }
+
+    // float alpha_c = mix(srgb_a.a, srgb_b.a, factor * percent);
+    float alpha_c = mix(alpha_a, alpha_b, factor * percent);
 
     // Final alpha is the minimum of the user selected colors
     // and the source color.
     // Not sure if alpha premultiply is an issue.
-    float alpha_c = mix(srgb_a.a, srgb_b.a, factor);
     COLOR = vec4(output.rgb, min(original_color.a, alpha_c));
     COLOR = vec4(output.rgb, original_color.a);
 }
