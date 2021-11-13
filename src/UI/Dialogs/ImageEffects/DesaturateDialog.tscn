@@ -4,9 +4,10 @@
 [ext_resource path="res://src/UI/TransparentChecker.tscn" type="PackedScene" id=2]
 
 [node name="DesaturateDialog" type="ConfirmationDialog"]
-margin_right = 294.0
-margin_bottom = 296.0
-rect_min_size = Vector2( 172, 60.2 )
+visible = false
+margin_right = 511.0
+margin_bottom = 272.0
+rect_min_size = Vector2( 150, 52.5 )
 window_title = "Desaturation"
 resizable = true
 script = ExtResource( 1 )
@@ -17,20 +18,20 @@ __meta__ = {
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_left = 8.0
 margin_top = 8.0
-margin_right = 286.0
-margin_bottom = 260.0
+margin_right = 804.0
+margin_bottom = 236.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer"]
-margin_right = 278.0
+margin_right = 796.0
 margin_bottom = 200.0
 size_flags_vertical = 3
 
 [node name="Preview" type="TextureRect" parent="VBoxContainer/AspectRatioContainer"]
-margin_left = 39.0
-margin_right = 239.0
+margin_left = 298.0
+margin_right = 498.0
 margin_bottom = 200.0
 rect_min_size = Vector2( 200, 200 )
 expand = true
@@ -43,64 +44,110 @@ anchor_bottom = 1.0
 margin_right = 0.0
 margin_bottom = 0.0
 
-[node name="RGBAContainer" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 204.0
-margin_right = 278.0
-margin_bottom = 224.0
-alignment = 1
-
-[node name="RButton" type="Button" parent="VBoxContainer/RGBAContainer"]
-margin_left = 91.0
-margin_right = 111.0
-margin_bottom = 20.0
-hint_tooltip = "Modify Red Channel"
-mouse_default_cursor_shape = 2
-toggle_mode = true
-pressed = true
-text = "R"
-
-[node name="GButton" type="Button" parent="VBoxContainer/RGBAContainer"]
-margin_left = 115.0
-margin_right = 137.0
-margin_bottom = 20.0
-hint_tooltip = "Modify Green Channel"
-mouse_default_cursor_shape = 2
-toggle_mode = true
-pressed = true
-text = "G"
-
-[node name="BButton" type="Button" parent="VBoxContainer/RGBAContainer"]
-margin_left = 141.0
-margin_right = 162.0
-margin_bottom = 20.0
-hint_tooltip = "Modify Blue Channel"
-mouse_default_cursor_shape = 2
-toggle_mode = true
-pressed = true
-text = "B"
-
-[node name="AButton" type="Button" parent="VBoxContainer/RGBAContainer"]
-margin_left = 166.0
-margin_right = 187.0
-margin_bottom = 20.0
-hint_tooltip = "Modify Alpha Channel"
-mouse_default_cursor_shape = 2
-toggle_mode = true
-text = "A"
-
 [node name="OptionsContainer" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 228.0
-margin_right = 278.0
-margin_bottom = 252.0
+margin_top = 204.0
+margin_right = 796.0
+margin_bottom = 228.0
+grow_vertical = 0
 
-[node name="SelectionCheckBox" type="CheckBox" parent="VBoxContainer/OptionsContainer"]
+[node name="ColorWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
+margin_right = 92.0
+margin_bottom = 24.0
+
+[node name="ColorLabel" type="Label" parent="VBoxContainer/OptionsContainer/ColorWidget"]
+margin_top = 5.0
+margin_right = 44.0
+margin_bottom = 19.0
+text = "Colors:"
+
+[node name="OriginColorPicker" type="ColorPickerButton" parent="VBoxContainer/OptionsContainer/ColorWidget"]
+margin_left = 48.0
+margin_right = 68.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+mouse_default_cursor_shape = 2
+
+[node name="DestColorPicker" type="ColorPickerButton" parent="VBoxContainer/OptionsContainer/ColorWidget"]
+margin_left = 72.0
+margin_right = 92.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 20, 0 )
+mouse_default_cursor_shape = 2
+color = Color( 1, 1, 1, 1 )
+
+[node name="LevelsWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
+margin_left = 96.0
+margin_right = 219.0
+margin_bottom = 24.0
+
+[node name="LevelsLabel" type="Label" parent="VBoxContainer/OptionsContainer/LevelsWidget"]
+margin_top = 5.0
+margin_right = 45.0
+margin_bottom = 19.0
+text = "Levels:"
+
+[node name="LevelsSpinBox" type="SpinBox" parent="VBoxContainer/OptionsContainer/LevelsWidget"]
+margin_left = 49.0
+margin_right = 123.0
+margin_bottom = 24.0
+mouse_default_cursor_shape = 2
+max_value = 128.0
+
+[node name="PercentWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
+margin_left = 223.0
+margin_right = 354.0
+margin_bottom = 24.0
+
+[node name="PercentLabel" type="Label" parent="VBoxContainer/OptionsContainer/PercentWidget"]
+margin_top = 5.0
+margin_right = 53.0
+margin_bottom = 19.0
+text = "Percent:"
+
+[node name="PercentSpinBox" type="SpinBox" parent="VBoxContainer/OptionsContainer/PercentWidget"]
+margin_left = 57.0
+margin_right = 131.0
+margin_bottom = 24.0
+mouse_default_cursor_shape = 2
+value = 100.0
+
+[node name="MethodWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
+margin_left = 358.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="MethodLabel" type="Label" parent="VBoxContainer/OptionsContainer/MethodWidget"]
+margin_top = 5.0
+margin_right = 53.0
+margin_bottom = 19.0
+text = "Method:"
+
+[node name="MethodComboBox" type="OptionButton" parent="VBoxContainer/OptionsContainer/MethodWidget"]
+margin_left = 57.0
+margin_right = 156.0
+margin_bottom = 24.0
+mouse_default_cursor_shape = 2
+text = "Luminance"
+items = [
+    "Luminance", null, false, 0, null,
+    "Average", null, false, 1, null,
+    "HSL", null, false, 2, null,
+    "HSV", null, false, 3, null ]
+selected = 0
+
+[node name="SelectionWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
+margin_left = 518.0
+margin_right = 796.0
+margin_bottom = 24.0
+
+[node name="SelectionCheckBox" type="CheckBox" parent="VBoxContainer/OptionsContainer/SelectionWidget"]
 margin_right = 160.0
 margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 pressed = true
 text = "Only affect selection"
 
-[node name="AffectOptionButton" type="OptionButton" parent="VBoxContainer/OptionsContainer"]
+[node name="AffectOptionButton" type="OptionButton" parent="VBoxContainer/OptionsContainer/SelectionWidget"]
 margin_left = 164.0
 margin_right = 278.0
 margin_bottom = 24.0
@@ -109,7 +156,8 @@ text = "Selected cels"
 items = [ "Selected cels", null, false, 0, null, "Current frame", null, false, 1, null, "All frames", null, false, 2, null, "All projects", null, false, 3, null ]
 selected = 0
 
-[connection signal="toggled" from="VBoxContainer/RGBAContainer/RButton" to="." method="_on_RButton_toggled"]
-[connection signal="toggled" from="VBoxContainer/RGBAContainer/GButton" to="." method="_on_GButton_toggled"]
-[connection signal="toggled" from="VBoxContainer/RGBAContainer/BButton" to="." method="_on_BButton_toggled"]
-[connection signal="toggled" from="VBoxContainer/RGBAContainer/AButton" to="." method="_on_AButton_toggled"]
+[connection signal="color_changed" from="VBoxContainer/OptionsContainer/ColorWidget/OriginColorPicker" to="." method="_on_OriginColorPicker_color_changed"]
+[connection signal="color_changed" from="VBoxContainer/OptionsContainer/ColorWidget/DestColorPicker" to="." method="_on_DestColorPicker_color_changed"]
+[connection signal="value_changed" from="VBoxContainer/OptionsContainer/LevelsWidget/LevelsSpinBox" to="." method="_on_LevelsSpinBox_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/OptionsContainer/PercentWidget/PercentSpinBox" to="." method="_on_PercentSpinBox_value_changed"]
+[connection signal="item_selected" from="VBoxContainer/OptionsContainer/MethodWidget/MethodComboBox" to="." method="_on_MethodComboBox_item_selected"]

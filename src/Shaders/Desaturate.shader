@@ -15,8 +15,16 @@ uniform vec4 srgb_b;
 uniform int levels;
 uniform float percent;
 
+float ltosChannel(float x) {
+    return (x > 0.0031308) ? (pow(x, 0.41666667) * 1.055 - 0.055) : (x * 12.92);
+}
+
+float stolChannel(float x) {
+    return (x > 0.04045) ? pow((x + 0.055) * 0.94786733, 2.4) : (x * 0.07739938);
+}
+
 float grayAverage(vec3 c) {
-    return (c.r + c.g + c.b) / 3.0;
+    return (c.r + c.g + c.b) * 0.3333333;
 }
 
 float grayHsv(vec3 c) {
@@ -27,8 +35,11 @@ float grayHsl(vec3 c) {
     return 0.5 * (max(c.r, max(c.g, c.b)) + min(c.r, min(c.g, c.b)));
 }
 
-float stolChannel(float x) {
-    return (x > 0.04045) ? pow((x + 0.055) / 1.055, 2.4) : (x / 12.92);
+float grayLuminance(vec3 lrgb) {
+	return ltosChannel(
+		0.21264935 * lrgb.r
+		+ 0.71516913 * lrgb.g
+		+ 0.07218152 * lrgb.b);
 }
 
 vec3 standardToLinear(vec3 c) {
@@ -36,10 +47,6 @@ vec3 standardToLinear(vec3 c) {
         stolChannel(c.r),
         stolChannel(c.g),
         stolChannel(c.b));
-}
-
-float ltosChannel(float x) {
-    return (x > 0.0031308) ? (pow(x, 1.0 / 2.4) * 1.055 - 0.055) : (x * 12.92);
 }
 
 vec3 linearToStandard(vec3 c) {
@@ -64,11 +71,11 @@ vec3 xyzToLinear(vec3 xyz) {
 }
 
 vec3 xyzToLab(vec3 xyz) {
-    vec3 v = xyz * vec3(1.0 / 0.95047, 1.0, 1.0 / 1.08883);
+    vec3 v = xyz * vec3(1.0521111, 1.0, 0.91841704);
 
-    v.x = (v.x > 0.008856) ? pow(v.x, 1.0 / 3.0) : (7.787 * v.x + 16.0 / 116.0);
-    v.y = (v.y > 0.008856) ? pow(v.y, 1.0 / 3.0) : (7.787 * v.y + 16.0 / 116.0);
-    v.z = (v.z > 0.008856) ? pow(v.z, 1.0 / 3.0) : (7.787 * v.z + 16.0 / 116.0);
+    v.x = (v.x > 0.008856) ? pow(v.x, 0.3333333) : (7.787 * v.x + 0.13793103);
+    v.y = (v.y > 0.008856) ? pow(v.y, 0.3333333) : (7.787 * v.y + 0.13793103);
+    v.z = (v.z > 0.008856) ? pow(v.z, 0.3333333) : (7.787 * v.z + 0.13793103);
 
     return vec3(
         116.0 * v.y - 16.0,
@@ -77,17 +84,17 @@ vec3 xyzToLab(vec3 xyz) {
 }
 
 vec3 labToXyz(vec3 lab) {
-    float vy = (lab.x + 16.0) / 116.0;
-    float vx = lab.y / 500.0 + vy;
-    float vz = vy - lab.z / 200.0;
+    float vy = (lab.x + 16.0) * 0.00862069;
+    float vx = lab.y * 0.002 + vy;
+    float vz = vy - lab.z * 0.005;
 
     float vye3 = vy * vy * vy;
     float vxe3 = vx * vx * vx;
     float vze3 = vz * vz * vz;
 
-    vy = (vye3 > 0.008856) ? vye3 : ((vy - 16.0 / 116.0) / 7.787);
-    vx = (vxe3 > 0.008856) ? vxe3 : ((vx - 16.0 / 116.0) / 7.787);
-    vz = (vze3 > 0.008856) ? vze3 : ((vz - 16.0 / 116.0) / 7.787);
+    vy = (vye3 > 0.008856) ? vye3 : ((vy - 0.13793103) * 0.12841916);
+    vx = (vxe3 > 0.008856) ? vxe3 : ((vx - 0.13793103) * 0.12841916);
+    vz = (vze3 > 0.008856) ? vze3 : ((vz - 0.13793103) * 0.12841916);
 
     return vec3(vx * 0.95047, vy, vz * 1.08883);
 }
@@ -110,22 +117,13 @@ void fragment() {
     } else if (is_hsv) {
         factor = grayHsv(original_color.rgb);
     } else {
-        // This could be shortened to just the y component
-        // of XYZ converted linear to standard, but the
-        // CIE LAB conversion methods are available anyway.
         vec3 lrgb_origin = standardToLinear(original_color.rgb);
-        vec3 xyz_origin = linearToXyz(lrgb_origin);
-        vec3 lab_origin = xyzToLab(xyz_origin);
-
-        // LAB expected range is [0, -110, -110] to [0, 110, 110].
-        // There is no true upper bound for a and b, the above
-        // are based on lab that falls in sRGB gamut.
-        factor = lab_origin.x * 0.01;
+		factor = grayLuminance(lrgb_origin);
     }
 
     // For pixel art, discrete steps may be preferable
     // over a smooth transition.
-       factor = quantize(factor, levels);
+    factor = quantize(factor, levels);
 
     // This assumes that a gradient consisting of two polar
     // colors is enough. Maybe a texture look up of an
