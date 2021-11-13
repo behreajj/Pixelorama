@@ -164,9 +164,12 @@ void fragment() {
         output = srgb_d;
     }
 
-    // Decision on what to do about alpha here.
-    // Decided to not have it impacted by percent.
-    float alpha_c = mix(alpha_a, alpha_b, factor);
-    float alpha_d = min(original_color.a, alpha_c);
-    COLOR = vec4(output.rgb, alpha_d);
+    // float alpha_c = mix(srgb_a.a, srgb_b.a, factor * percent);
+    float alpha_c = mix(alpha_a, alpha_b, factor * percent);
+
+    // Final alpha is the minimum of the user selected colors
+    // and the source color.
+    // Not sure if alpha premultiply is an issue.
+    COLOR = vec4(output.rgb, min(original_color.a, alpha_c));
+    COLOR = vec4(output.rgb, original_color.a);
 }
