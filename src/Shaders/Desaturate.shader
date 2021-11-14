@@ -9,13 +9,13 @@ uniform bool is_avg;
 uniform bool is_hsl;
 uniform bool is_hsv;
 
-// uniform vec4 srgb_a;
-// uniform vec4 srgb_b;
+uniform vec4 srgb_a;
+uniform vec4 srgb_b;
 
-uniform vec3 lab_a;
-uniform float alpha_a;
-uniform vec3 lab_b;
-uniform float alpha_b;
+// uniform vec3 lab_a;
+// uniform float alpha_a;
+// uniform vec3 lab_b;
+// uniform float alpha_b;
 
 uniform int levels;
 uniform float percent;
@@ -128,6 +128,7 @@ void fragment() {
     } else if (is_hsv) {
         factor = grayHsv(original_color.rgb);
     } else {
+        // The origin is needed as CIE LAB anyway.
 		// factor = grayLuminance(lrgb_origin);
         factor = lab_origin.x * 0.01;
     }
@@ -138,15 +139,15 @@ void fragment() {
 
     // Convert a color to LAB.
     // This could be done on the CPU and passed in.
-    // vec3 lrgb_a = standardToLinear(srgb_a.rgb);
-    // vec3 xyz_a = linearToXyz(lrgb_a);
-    // vec3 lab_a = xyzToLab(xyz_a);
+    vec3 lrgb_a = standardToLinear(srgb_a.rgb);
+    vec3 xyz_a = linearToXyz(lrgb_a);
+    vec3 lab_a = xyzToLab(xyz_a);
 
     // Convert b color to LAB.
     // This could be done on the CPU and passed in.
-    // vec3 lrgb_b = standardToLinear(srgb_b.rgb);
-    // vec3 xyz_b = linearToXyz(lrgb_b);
-    // vec3 lab_b = xyzToLab(xyz_b);
+    vec3 lrgb_b = standardToLinear(srgb_b.rgb);
+    vec3 xyz_b = linearToXyz(lrgb_b);
+    vec3 lab_b = xyzToLab(xyz_b);
 
     // Mix colors by brightness, then mix by percent.
     // Convert from CIE LAB back to sRGB.
@@ -157,8 +158,8 @@ void fragment() {
     lrgb_d = min(max(lrgb_d, 0.0), 1.0);
     vec3 srgb_d = linearToStandard(lrgb_d);
 
-    float alpha_c = mix(alpha_a, alpha_b, factor);
-    // float alpha_d = mix(alpha_origin, alpha_c, percent);
+    // float alpha_c = mix(alpha_a, alpha_b, factor);
+    float alpha_c = mix(srgb_a.a, srgb_b.a, factor);
     float alpha_d = min(alpha_origin, alpha_c);
 
     if(affect_selection && has_selection) {

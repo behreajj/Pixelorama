@@ -31,12 +31,12 @@ func _about_to_show():
 	# colors is enough. Maybe a texture look up of an
 	# image with 1x1 swatch for each palette entry would be
 	# the next step?
-
+	confirmed = false
 	var sm : ShaderMaterial = ShaderMaterial.new()
 	sm.shader = load(shaderPath)
 	preview.set_material(sm)
 	._about_to_show()
-	confirmed = false
+
 
 
 func set_nodes() -> void:
@@ -59,13 +59,12 @@ func commit_action(_cel : Image, _project : Project = Global.current_project) ->
 		preview.material.set_shader_param("is_avg", is_avg)
 		preview.material.set_shader_param("is_hsl", is_hsl)
 		preview.material.set_shader_param("is_hsv", is_hsv)
-#		preview.material.set_shader_param("srgb_a", srgb_a)
-#		preview.material.set_shader_param("srgb_b", srgb_b)
-		preview.material.set_shader_param("lab_a", lab_a)
-		preview.material.set_shader_param("lab_b", lab_b)
-		preview.material.set_shader_param("lab_a", lab_a)
-		preview.material.set_shader_param("alpha_a", srgb_a.a)
-		preview.material.set_shader_param("alpha_b", srgb_b.a)
+		preview.material.set_shader_param("srgb_a", srgb_a)
+		preview.material.set_shader_param("srgb_b", srgb_b)
+#		preview.material.set_shader_param("lab_a", lab_a)
+#		preview.material.set_shader_param("lab_b", lab_b)
+#		preview.material.set_shader_param("alpha_a", srgb_a.a)
+#		preview.material.set_shader_param("alpha_b", srgb_b.a)
 		preview.material.set_shader_param("levels", levels)
 		preview.material.set_shader_param("percent", percent)
 		preview.material.set_shader_param("selection", selection_tex)
@@ -76,12 +75,12 @@ func commit_action(_cel : Image, _project : Project = Global.current_project) ->
 			"is_avg": is_avg,
 			"is_hsl": is_hsl,
 			"is_hsv": is_hsv,
-#			"srgb_a": srgb_a,
-#			"srgb_b": srgb_b,
-			"lab_a": lab_a,
-			"lab_b": lab_b,
-			"alpha_a": srgb_a.a,
-			"alpha_b": srgb_b.a,
+			"srgb_a": srgb_a,
+			"srgb_b": srgb_b,
+#			"lab_a": lab_a,
+#			"lab_b": lab_b,
+#			"alpha_a": srgb_a.a,
+#			"alpha_b": srgb_b.a,
 			"levels": levels,
 			"percent": percent,
 			"selection": selection_tex,
@@ -95,13 +94,13 @@ func commit_action(_cel : Image, _project : Project = Global.current_project) ->
 
 func _on_OriginColorPicker_color_changed(color: Color) -> void:
 	srgb_a = color
-	lab_a = srgb_to_lab(srgb_a)
+#	lab_a = srgb_to_lab(srgb_a)
 	update_preview()
 
 
 func _on_DestColorPicker_color_changed(color: Color) -> void:
 	srgb_b = color
-	lab_b = srgb_to_lab(srgb_b)
+#	lab_b = srgb_to_lab(srgb_b)
 	update_preview()
 
 
@@ -156,6 +155,7 @@ func xyz_to_lab(xyz:Vector3) -> Vector3:
 	var vy: float = xyz_to_lab_channel(xyz.y)
 	var vz: float = xyz_to_lab_channel(xyz.z * 0.91841704)
 
+	# Packs result as x = L, y = a, z = b.
 	return Vector3(
 		116.0 * vy - 16.0,
 		500.0 * (vx - vy),

@@ -4,8 +4,8 @@
 [ext_resource path="res://src/UI/TransparentChecker.tscn" type="PackedScene" id=2]
 
 [node name="DesaturateDialog" type="ConfirmationDialog"]
-margin_right = 511.0
-margin_bottom = 272.0
+margin_right = 294.0
+margin_bottom = 376.0
 rect_min_size = Vector2( 150, 52.5 )
 window_title = "Desaturation"
 resizable = true
@@ -17,20 +17,20 @@ __meta__ = {
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_left = 8.0
 margin_top = 8.0
-margin_right = 804.0
-margin_bottom = 236.0
+margin_right = 286.0
+margin_bottom = 340.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer"]
-margin_right = 796.0
+margin_right = 278.0
 margin_bottom = 200.0
 size_flags_vertical = 3
 
 [node name="Preview" type="TextureRect" parent="VBoxContainer/AspectRatioContainer"]
-margin_left = 298.0
-margin_right = 498.0
+margin_left = 39.0
+margin_right = 239.0
 margin_bottom = 200.0
 rect_min_size = Vector2( 200, 200 )
 expand = true
@@ -43,20 +43,14 @@ anchor_bottom = 1.0
 margin_right = 0.0
 margin_bottom = 0.0
 
-[node name="OptionsContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="OptionsContainer" type="VBoxContainer" parent="VBoxContainer"]
 margin_top = 204.0
-margin_right = 796.0
-margin_bottom = 460.0
-grow_horizontal = 0
-grow_vertical = 0
-rect_clip_content = true
-size_flags_horizontal = 2
-size_flags_vertical = 2
+margin_right = 278.0
+margin_bottom = 332.0
 
 [node name="ColorWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
-margin_right = 92.0
+margin_right = 278.0
 margin_bottom = 20.0
-size_flags_horizontal = 0
 size_flags_vertical = 0
 
 [node name="ColorLabel" type="Label" parent="VBoxContainer/OptionsContainer/ColorWidget"]
@@ -81,10 +75,9 @@ mouse_default_cursor_shape = 2
 color = Color( 1, 1, 1, 1 )
 
 [node name="LevelsWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
-margin_left = 96.0
-margin_right = 219.0
-margin_bottom = 24.0
-size_flags_horizontal = 0
+margin_top = 24.0
+margin_right = 278.0
+margin_bottom = 48.0
 size_flags_vertical = 0
 
 [node name="LevelsLabel" type="Label" parent="VBoxContainer/OptionsContainer/LevelsWidget"]
@@ -101,10 +94,9 @@ mouse_default_cursor_shape = 2
 max_value = 128.0
 
 [node name="PercentWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
-margin_left = 223.0
-margin_right = 354.0
-margin_bottom = 24.0
-size_flags_horizontal = 0
+margin_top = 52.0
+margin_right = 278.0
+margin_bottom = 76.0
 size_flags_vertical = 0
 
 [node name="PercentLabel" type="Label" parent="VBoxContainer/OptionsContainer/PercentWidget"]
@@ -121,10 +113,9 @@ mouse_default_cursor_shape = 2
 value = 100.0
 
 [node name="MethodWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
-margin_left = 358.0
-margin_right = 514.0
-margin_bottom = 20.0
-size_flags_horizontal = 0
+margin_top = 80.0
+margin_right = 278.0
+margin_bottom = 100.0
 size_flags_vertical = 0
 
 [node name="MethodLabel" type="Label" parent="VBoxContainer/OptionsContainer/MethodWidget"]
@@ -143,14 +134,15 @@ items = [ "Luminance", null, false, 0, null, "Average", null, false, 1, null, "H
 selected = 0
 
 [node name="SelectionWidget" type="HBoxContainer" parent="VBoxContainer/OptionsContainer"]
-margin_left = 518.0
-margin_right = 796.0
-margin_bottom = 24.0
-size_flags_horizontal = 0
+margin_top = 104.0
+margin_right = 278.0
+margin_bottom = 128.0
+size_flags_horizontal = 5
 size_flags_vertical = 0
 
 [node name="SelectionCheckBox" type="CheckBox" parent="VBoxContainer/OptionsContainer/SelectionWidget"]
-margin_right = 160.0
+margin_left = -5.0
+margin_right = 155.0
 margin_bottom = 24.0
 mouse_default_cursor_shape = 2
 pressed = true
