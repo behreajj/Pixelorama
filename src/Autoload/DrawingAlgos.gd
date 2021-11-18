@@ -1,9 +1,6 @@
 extends Node
 
 
-enum GradientDirection {TOP, BOTTOM, LEFT, RIGHT}
-
-
 func scale3X(sprite : Image, tol : float = 50) -> Image:
 	var scaled := Image.new()
 	scaled.create(sprite.get_width()*3, sprite.get_height()*3, false, Image.FORMAT_RGBA8)
@@ -573,53 +570,3 @@ func generate_outline(image : Image, affect_selection : bool, project : Project,
 # 			c.s = sat
 # 			c.v = val
 # 			img.set_pixelv(pos, c)
-
-
-func generate_gradient(image : Image, colors : Array, steps : int, direction : int, affect_selection : bool, project : Project) -> void:
-	if colors.size() < 2:
-		return
-
-	var t = 1.0 / (steps - 1)
-	for i in range(1, steps - 1):
-		var color : Color
-		color = colors[-1].linear_interpolate(colors[0], t * i)
-		colors.insert(1, color)
-
-	if direction == GradientDirection.BOTTOM or direction == GradientDirection.RIGHT:
-		colors.invert()
-
-	var draw_rectangle := Rect2()
-	var selection := affect_selection and project.has_selection
-	if selection:
-		draw_rectangle = project.get_selection_rectangle()
-	else:
-		draw_rectangle = Rect2(Vector2.ZERO, project.size)
-	var size := draw_rectangle.size
-	image.lock()
-	var gradient_size
-
-	if direction == GradientDirection.TOP or direction == GradientDirection.BOTTOM:
-		gradient_size = size.y / steps
-		for i in steps:
-			for xx in size.x:
-				var start = i * gradient_size
-				var end = (i + 1) * gradient_size
-				for yy in range(start, end):
-					var pos : Vector2 = Vector2(xx, yy) + draw_rectangle.position
-					if selection and !project.selection_bitmap.get_bit(pos):
-						continue
-					image.set_pixelv(pos, colors[i])
-
-	else:
-		gradient_size = size.x / steps
-		for i in steps:
-			for yy in size.y:
-				var start = i * gradient_size
-				var end = (i + 1) * gradient_size
-				for xx in range(start, end):
-					var pos : Vector2 = Vector2(xx, yy) + draw_rectangle.position
-					if selection and !project.selection_bitmap.get_bit(pos):
-						continue
-					image.set_pixelv(pos, colors[i])
-
-	image.unlock()
